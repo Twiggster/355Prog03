@@ -1,6 +1,6 @@
 <?php
      
-		require "../Prog3/database.php";
+		require "database.php";
 
 	
  
@@ -9,11 +9,13 @@
         $nameError = null;
         $emailError = null;
         $mobileError = null;
+		$passwordError = null;
          
         // keep track post values
         $name = $_POST['name'];
         $email = $_POST['email'];
         $mobile = $_POST['mobile'];
+		$password = $_POST['password'];
          
         // validate input
         $valid = true;
@@ -36,14 +38,18 @@
             $mobileError = 'Please enter Mobile Number';
             $valid = false;
         }
+		if (empty($password)) {
+            $passwordError = 'Please enter a Password';
+            $valid = false;
+        }
          
         // insert data
         if ($valid) {
             $pdo = Database::connect();
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $sql = "INSERT INTO Customers (id, name,email,mobile, password_hash) values('NULL',?, ?, ?, 'NULL')";
+            $sql = "INSERT INTO Customer ( name,email,mobile, PasswordHashed) values(?, ?, ?, ?)";
             $q = $pdo->prepare($sql);
-            $q->execute(array($name,$email,$mobile));
+            $q->execute(array($name,$email,$mobile,$password));
             Database::disconnect();
             header("Location: login.php");
         }
@@ -90,6 +96,15 @@
 					<input name="mobile" type="text"  placeholder="Mobile Number" value="<?php echo !empty($mobile)?$mobile:'';?>">
 					<?php if (!empty($mobileError)): ?>
 						<span class="help-inline"><?php echo $mobileError;?></span>
+					<?php endif;?>
+				</div>
+			  </div>
+			  <div class="control-group <?php echo !empty($passwordError)?'error':'';?>">
+				<label class="control-label">Password</label>
+				<div class="controls">
+					<input name="password" type="password"  placeholder="password" value="<?php echo !empty($password)?$password:'';?>">
+					<?php if (!empty($passwordError)): ?>
+						<span class="help-inline"><?php echo $passwordError;?></span>
 					<?php endif;?>
 				</div>
 			  </div>

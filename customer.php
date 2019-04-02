@@ -1,11 +1,19 @@
 <?php
 
+session_start();
+//var_dump($_SESSION);
+if(!isset($_SESSION["ASDjiadfj"]))
+{
+	session_destroy();
+	header('Location: login.php');
+	exit();
+}
 // include the class that handles database connections
-require "../prog02/database.php";
+require "database.php";
 
 // include the class containing functions/methods for "customer" table
 // Note: this application uses "customer" table, not "cusotmers" table
-require "customer.class.php";
+require "customers.class.php";
 $cust = new Customer();
  
 // set active record field values, if any 

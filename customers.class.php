@@ -5,10 +5,12 @@ class Customer {
     public $name;
     public $email;
     public $mobile;
+	public $Password;
     private $noerrors = true;
     private $nameError = null;
     private $emailError = null;
     private $mobileError = null;
+	private $passwordError = null;
     private $title = "Customer";
     private $tableName = "customer";
     
@@ -17,6 +19,7 @@ class Customer {
         $this->generate_form_group("name", $this->nameError, $this->name, "autofocus");
         $this->generate_form_group("email", $this->emailError, $this->email);
         $this->generate_form_group("mobile", $this->mobileError, $this->mobile);
+		$this->generate_form_group("password",$this->passwordError, $this->Password);
         $this->generate_html_bottom (1);
     } // end function create_record()
     
@@ -68,9 +71,10 @@ class Customer {
             // if valid data, insert record into table
             $pdo = Database::connect();
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $sql = "INSERT INTO $this->tableName (name,email,mobile) values(?, ?, ?)";
+			$this->Password= MD5($this->Password);
+            $sql = "INSERT INTO $this->tableName (name,email,mobile,PasswordHashed) values(?, ?, ?, ?)";
             $q = $pdo->prepare($sql);
-            $q->execute(array($this->name,$this->email,$this->mobile));
+            $q->execute(array($this->name,$this->email,$this->mobile,$this->Password));
             Database::disconnect();
             header("Location: $this->tableName.php"); // go back to "list"
         }
@@ -239,6 +243,11 @@ class Customer {
             $this->mobileError = 'Please enter Mobile phone number';
             $valid = false;
         }
+		if (empty($this->Password)) {
+            $this->passwordError = 'Please enter a password';
+            $valid = false;
+        }
+		
         return $valid;
     } // end function fieldsAllValid() 
     
@@ -256,15 +265,16 @@ class Customer {
         echo "
             </head>
             <body>
-                <a href='https://github.com/Twiggster/phpProg02' target='_blank'>Github</a><br />
-				<a href='http://csis.svsu.edu/~fjschulz/prog02/Screenflow.png' target='_blank'>Screenflow</a><br />
-				<a href='http://csis.svsu.edu/~fjschulz/prog02/UML.png' target='_blank'>UML</a><br />
+                <a href='https://github.com/Twiggster/355Prog03' target='_blank'>Github</a><br />
+				// <a href='http://csis.svsu.edu/~fjschulz/prog02/Screenflow.png' target='_blank'>Screenflow</a><br />
+				// <a href='http://csis.svsu.edu/~fjschulz/prog02/UML.png' target='_blank'>UML</a><br />
                 <div class='container'>
                     <p class='row'>
                         <h3>$this->title" . "s" . "</h3>
                     </p>
                     <p>
                         <a href='$this->tableName.php?fun=display_create_form' class='btn btn-success'>Create</a>
+						<a href='logout.php' class='btn btn-warning'>Logout</a>
                     </p>
                     <div class='row'>
                         <table class='table table-striped table-bordered'>
